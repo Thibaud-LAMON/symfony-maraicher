@@ -1,5 +1,9 @@
 <?php
 
+/**
+ *L'utilisation de doctrine étant prohibée, cette classe permet la connection d'autres classes à la base de données
+ */
+
 namespace App\Service;
 
 use PDO;

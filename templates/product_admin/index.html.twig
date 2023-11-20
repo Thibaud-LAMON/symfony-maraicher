@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration produits{% endblock %}
+
+{% block body %}
+    <button>Ajouter un produit</button>
+    <div class="content">
+        <br>
+        {% for produit in products%}
+            <div class="card">
+                {# Les produit devaient s'afficher sous forme de cartes avec l'image à gauche #}
+                <img class="card-image" src="{{ produit.image }}" width="64px" height="64px">
+                <p class="">{{ produit.name }}</p>
+                <p>{{ produit.price }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

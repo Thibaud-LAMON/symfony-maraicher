@@ -1,0 +1,17 @@
+<html>
+        <body>
+        Bonjour {{ clientName }},<br><br>
+
+        Merci d'avoir passé commande auprès de nous, voici ce que vous avez acheté :<br>
+
+        {% for product in orderDetails %}
+            {{ product.quantity }} {{ product.name }}<br>
+        {% endfor %}
+
+        Votre commande est bien enregistrée. Vous serez prévenu(e) lorsqu'elle sera prête.<br><br>
+
+        Bien à Vous,<br><br>
+
+        Le Maraicher.
+    </body>
+</html>

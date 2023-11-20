@@ -6,3 +6,12 @@
     background-color: #ddd;
     padding: 10px;
 }
+
+.card{
+    border: solid black;
+}
+
+.card-image{
+    float:left;
+    display:block;
+}

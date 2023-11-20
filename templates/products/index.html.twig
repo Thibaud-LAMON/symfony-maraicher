@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos produits{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <h1 class="title">Composez votre panier</h1>
+        <br>
+        {% for produit in products%}
+            <div class="card">
+                {# Les produit devaient s'afficher sous forme de cartes avec l'image à gauche #}
+                <img class="card-image" src="{{ produit.image }}" width="64px" height="64px">
+                <p class="">{{ produit.name }}</p>
+                <p>{{ produit.price }}</p>
+            </div>
+        {% endfor %}
+
+        <button>Passer commande</button>
+    </div>
+{% endblock %}

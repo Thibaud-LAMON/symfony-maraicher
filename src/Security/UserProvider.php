@@ -9,9 +9,17 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use App\Service\DatabaseConnection;
+
 
 class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
+    private $databaseConnection;
+
+    public function __construct(DatabaseConnection $databaseConnection)
+    {
+        $this->databaseConnection = $databaseConnection;
+    }
     /**
      * Symfony calls this method if you use features like switch_user
      * or remember_me.
@@ -23,12 +31,23 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
      */
     public function loadUserByIdentifier($identifier): UserInterface
     {
-        // Load a User object from your data source or throw UserNotFoundException.
-        // The $identifier argument may not actually be a username:
-        // it is whatever value is being returned by the getUserIdentifier()
-        // method in your User class.
-        throw new \Exception('TODO: fill in loadUserByIdentifier() inside '.__FILE__);
+        // récupére les données de l'utilisateur
+        $stmt = $this->databaseConnection->getConnection()->prepare("SELECT * FROM admins WHERE username = :username");
+        $stmt->execute(['username' => $identifier]);
+
+        $userData = $stmt->fetch();
+
+        if ($userData) {
+            $user = new Admins();
+            $user->setUsername($userData['username']);
+            $user->setPassword($userData['password']);
+
+            return $user;
+        }
+
+        throw new UserNotFoundException(sprintf('User "%s" not found.', $identifier));
     }
+
 
     /**
      * @deprecated since Symfony 5.3, loadUserByIdentifier() is used instead
@@ -55,10 +74,10 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', $user::class));
         }
 
-        // Return a User object after making sure its data is "fresh".
-        // Or throw a UsernameNotFoundException if the user no longer exists.
-        throw new \Exception('TODO: fill in refreshUser() inside '.__FILE__);
+        // Recharge les données de l'utilisateur comme dans loadUserByIdentifier
+        return $this->loadUserByIdentifier($user->getUsername());
     }
+
 
     /**
      * Tells Symfony to use this provider for this User class.
@@ -73,8 +92,14 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        // TODO: when hashed passwords are in use, this method should:
-        // 1. persist the new password in the user storage
-        // 2. update the $user object with $user->setPassword($newHashedPassword);
+        // Mettre à jour le mot de passe hashé dans la base de données
+        $stmt = $this->databaseConnection->getConnection()->prepare("UPDATE admins SET password = :password WHERE username = :username");
+        $stmt->execute([
+            'password' => $newHashedPassword,
+            'username' => $user->getUsername(),
+        ]);
+
+        $user->setPassword($newHashedPassword);
     }
+
 }
